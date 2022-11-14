@@ -1,9 +1,11 @@
-import { resolve } from 'path'
+const { resolve } = require('path')
 
-export const configPath = () => {
+const configPath = () => {
   return resolve('./config.txt')
 }
 
-export const topName = (url) => {
+const topName = (url) => {
   return url.split('/')[4]
 }
+
+module.exports = { configPath, topName }

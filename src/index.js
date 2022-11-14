@@ -1,7 +1,7 @@
-import yaml from 'js-yaml'
-import fs from 'fs'
-import { configPath, topName } from './utils.js'
-import { browserIsOK, vote } from './puppet.js'
+const yaml = require('js-yaml')
+const fs = require('fs')
+const { configPath, topName } = require('./utils.js')
+const { browserIsOK, vote } = require('./puppet.js')
 
 let user
 let tops

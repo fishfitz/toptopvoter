@@ -1,5 +1,5 @@
-import puppeteer from 'puppeteer'
-import sleep from 'await-sleep'
+const puppeteer = require('puppeteer')
+const sleep = require('await-sleep')
 
 const waitUntil = ['networkidle2', 'domcontentloaded']
 
@@ -7,7 +7,7 @@ const isNumeric = (n) => {
   return !isNaN(parseFloat(n)) && isFinite(n)
 }
 
-export const browserIsOK = async () => {
+const browserIsOK = async () => {
   try {
     const browser = await puppeteer.launch()
     await browser.close()
@@ -67,13 +67,13 @@ const resolveGrid = async (page, user) => {
     await page.waitForNavigation({ waitUntil })
     const failure = (await page.$x('//p[@class=\'nv_adm\'][contains(., \'mal reproduite\')]'))[0]
     if (failure) {
-      await page.goBack(({ waitUntil: ['networkidle2', 'domcontentloaded'] }))
+      await page.goBack(({ waitUntil }))
       await resolveGrid(page, user)
     }
   }
 }
 
-export const vote = async ({ name, url, grid }, user, silent) => {
+const vote = async ({ name, url, grid }, user, silent) => {
   const browser = await puppeteer.launch({ headless: silent })
   const page = await browser.newPage()
 
@@ -97,3 +97,5 @@ export const vote = async ({ name, url, grid }, user, silent) => {
 
   return true
 }
+
+module.exports = { browserIsOK, vote }
