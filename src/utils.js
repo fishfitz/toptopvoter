@@ -1,13 +1,7 @@
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-
-const getDirname = () => {
-  const __filename = fileURLToPath(import.meta.url)
-  return dirname(__filename)
-}
+import { resolve } from 'path'
 
 export const configPath = () => {
-  return join(getDirname(), '../config.txt')
+  return resolve('./config.txt')
 }
 
 export const topName = (url) => {

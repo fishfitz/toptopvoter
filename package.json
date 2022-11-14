@@ -6,7 +6,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "nexe src/index.js"
+    "build": "esbuild ./src/index.js --bundle --platform=node --outfile=dist/toptopvoter.cjs && pkg ./dist/toptopvoter.cjs --out-path=./dist/"
   },
   "dependencies": {
     "await-sleep": "^0.0.1",
@@ -14,11 +14,12 @@
     "puppeteer": "^19.2.2"
   },
   "devDependencies": {
+    "esbuild": "^0.15.13",
     "eslint": "^8.0.1",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-n": "^15.0.0",
     "eslint-plugin-promise": "^6.0.0",
-    "nexe": "^4.0.0-rc.1"
+    "pkg": "^5.8.0"
   }
 }
