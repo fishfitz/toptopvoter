@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer')
 const sleep = require('await-sleep')
+const { AsyncFunction } = require('./utils')
 
 const waitUntil = ['networkidle2', 'domcontentloaded']
 
@@ -7,9 +8,9 @@ const isNumeric = (n) => {
   return !isNaN(parseFloat(n)) && isFinite(n)
 }
 
-const browserIsOK = async () => {
+const browserIsOK = async (config) => {
   try {
-    const browser = await puppeteer.launch()
+    const browser = await puppeteer.launch(config)
     await browser.close()
     return true
   } catch (e) {
@@ -21,9 +22,8 @@ const browserIsOK = async () => {
 // Fill voter id field
 const fillUser = async (page, user) => {
   if (user) {
-    await page.$eval('input[name=votant]', (e, user) => {
-      e.value = user
-    }, user)
+    // eslint-disable-next-line no-return-assign
+    await page.$eval('input[name=votant]', '(e, user) => e.value = user', user)
   }
 }
 
@@ -38,7 +38,7 @@ const resolveGrid = async (page, user) => {
   await fillUser(page, user)
 
   await page.addScriptTag({ url: 'https://unpkg.com/tesseract.js@v2.0.0-beta.1/dist/tesseract.min.js' })
-  const result = await page.evaluate(async () => {
+  const result = await page.evaluate(new AsyncFunction('', `
     const image = document.getElementById('Patcha')
 
     const canvas = document.createElement('canvas')
@@ -51,11 +51,12 @@ const resolveGrid = async (page, user) => {
     // eslint-disable-next-line no-undef
     const { data: { text } } = await Tesseract.recognize(dataURL)
     return text.trim()
-  })
+  `))
 
   // Check if the result is likely, else try again
   if (result.length !== 2 || !isNumeric(result)) {
-    page.reload({ waitUntil: ['networkidle2', 'domcontentloaded'] })
+    console.log('wrong result')
+    await page.reload({ waitUntil })
     await resolveGrid(page, user)
   } else {
     // Enter digits in grid
@@ -67,14 +68,15 @@ const resolveGrid = async (page, user) => {
     await page.waitForNavigation({ waitUntil })
     const failure = (await page.$x('//p[@class=\'nv_adm\'][contains(., \'mal reproduite\')]'))[0]
     if (failure) {
+      console.log('failure...')
       await page.goBack(({ waitUntil }))
       await resolveGrid(page, user)
     }
   }
 }
 
-const vote = async ({ name, url, grid }, user, silent) => {
-  const browser = await puppeteer.launch({ headless: silent })
+const vote = async ({ name, url, grid }, user, silent, config) => {
+  const browser = await puppeteer.launch({ headless: silent, ...config })
   const page = await browser.newPage()
 
   // Navigate twice because of a quirk in root-top code

@@ -1,4 +1,5 @@
 silent: true
+chrome_path: auto
 name: TON NOM ICI
 tops:
 - http://www.root-top.com/topsite/virtu4lgames/in.php?IDmark=6594
